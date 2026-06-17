@@ -163,7 +163,7 @@ export default function Footer() {
         <div className="border-t border-border mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-500 text-sm font-inter">
-              Made by <span className="text-accent-gold font-semibold">Ahmed Khan</span>. All rights reserved.
+              © Made by <a href="https://ahmed.nexcoreinstitute.org/" target="_blank" rel="noopener noreferrer" className="text-accent-gold font-semibold hover:underline">Ahmed Khan</a>. All rights reserved.
             </p>
             <p className="text-gray-600 text-xs font-inter">
               Trading involves risk. Past performance is not indicative of future results.

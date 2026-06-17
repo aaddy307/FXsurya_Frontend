@@ -12,12 +12,6 @@ import axios from "@/lib/axios";
 import toast from "react-hot-toast";
 import { getErrorMessage } from "@/lib/utils";
 
-export const metadata = {
-  title: "Contact FXSurya - Get in Touch",
-  description:
-    "Contact FXSurya for trading mentorship inquiries, capital partnership proposals, or general questions. Usually responds within 24 hours.",
-};
-
 const socialLinks = [
   { 
     href: "https://instagram.com/fxupdates_official", 
@@ -75,7 +69,7 @@ const socialLinks = [
   },
 ];
 
-export default function ContactPage() {
+export default function ContactPageContent() {
   const [form, setForm] = useState({ name: "", email: "", type: "student", message: "" });
   const [loading, setLoading] = useState(false);
 

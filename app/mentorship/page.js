@@ -12,6 +12,12 @@ import axios from "@/lib/axios";
 import toast from "react-hot-toast";
 import { getErrorMessage } from "@/lib/utils";
 
+export const metadata = {
+  title: "Trader Family Mentorship - Learn to Trade & Get Funded",
+  description:
+    "Join FXSurya's exclusive Trader Family mentorship. Get live trading sessions, daily chart analysis, prop firm guidance, and direct access to a funded trader.",
+};
+
 const features = [
   "Live trading sessions",
   "Daily chart analysis",

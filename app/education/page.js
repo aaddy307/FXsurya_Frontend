@@ -10,6 +10,12 @@ import CategoryFilter from "@/components/ui/CategoryFilter";
 import Button from "@/components/ui/Button";
 import axios from "@/lib/axios";
 
+export const metadata = {
+  title: "Free Trading Education - Forex & Crypto Content",
+  description:
+    "Access free forex and crypto trading content. No fluff, just real market insights from a funded trader. Learn price action, risk management, and prop firm strategies.",
+};
+
 export default function EducationPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);

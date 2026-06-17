@@ -12,6 +12,12 @@ import axios from "@/lib/axios";
 import toast from "react-hot-toast";
 import { getErrorMessage } from "@/lib/utils";
 
+export const metadata = {
+  title: "Capital Partnership - Partner with a Funded Trader",
+  description:
+    "Explore capital partnership opportunities with FXSurya. Proven prop firm track record, transparent trading approach, and flexible capital management structures.",
+};
+
 const offerings = [
   "Proven prop firm track record",
   "Transparent trading approach (Forex + Crypto)",

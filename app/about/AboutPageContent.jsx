@@ -4,12 +4,6 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 
-export const metadata = {
-  title: "About FXSurya - Funded Trader & Market Authority",
-  description:
-    "Learn about FXSurya's trading journey from starting in 2021 to becoming a funded trader with multiple prop firms. Discover the philosophy behind consistent profitability.",
-};
-
 const timeline = [
   { year: "2021", event: "Started Forex Trading" },
   { year: "2022", event: "First Prop Firm Challenge Passed" },
@@ -26,7 +20,7 @@ const quotes = [
 
 const skills = ["Forex", "Crypto", "Price Action", "Risk Management", "Prop Firms", "Market Psychology"];
 
-export default function AboutPage() {
+export default function AboutPageContent() {
   return (
     <main>
       <Navbar />
