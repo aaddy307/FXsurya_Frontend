@@ -170,20 +170,22 @@ export default function AdminVideosPage() {
       )}
 
       {editModal.open && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <GlassCard className="max-w-4xl w-full p-6 md:p-8 my-8 relative">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <GlassCard className="max-w-4xl w-full p-6 md:p-8 my-4 relative flex flex-col max-h-[90vh]">
             <button
               onClick={() => setEditModal({ open: false, video: null })}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-10"
             >
               ✕
             </button>
-            <h3 className="font-bebas text-3xl text-white mb-6">Edit Video</h3>
-            <VideoForm
-              initialData={editModal.video}
-              onSubmit={handleUpdate}
-              loading={editLoading}
-            />
+            <h3 className="font-bebas text-3xl text-white mb-6 shrink-0">Edit Video</h3>
+            <div className="overflow-y-auto flex-1 pr-2">
+              <VideoForm
+                initialData={editModal.video}
+                onSubmit={handleUpdate}
+                loading={editLoading}
+              />
+            </div>
           </GlassCard>
         </div>
       )}
