@@ -116,11 +116,11 @@ export default function AdminVideosPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A]">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#0A0A0A]">
       <AdminSidebar onLogout={handleLogout} />
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 pt-16 md:pt-0">
         <AdminHeader title="Videos" />
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
             <p className="text-gray-400 font-inter text-sm">
               {videos.length} video{videos.length !== 1 ? "s" : ""} total

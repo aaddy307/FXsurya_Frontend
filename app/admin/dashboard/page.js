@@ -98,11 +98,11 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A]">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#0A0A0A]">
       <AdminSidebar onLogout={handleLogout} />
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 pt-16 md:pt-0">
         <AdminHeader title="Dashboard" />
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((i) => (

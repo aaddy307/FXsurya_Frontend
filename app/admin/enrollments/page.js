@@ -86,11 +86,11 @@ export default function AdminEnrollmentsPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A]">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#0A0A0A]">
       <AdminSidebar onLogout={handleLogout} />
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 pt-16 md:pt-0">
         <AdminHeader title="Enrollments" />
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <p className="text-gray-400 font-inter text-sm mb-6">
             {enrollments.length} enrollment{enrollments.length !== 1 ? "s" : ""} total
           </p>
