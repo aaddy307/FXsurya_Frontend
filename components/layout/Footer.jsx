@@ -168,6 +168,12 @@ export default function Footer() {
             <p className="text-gray-600 text-xs font-inter">
               Trading involves risk. Past performance is not indicative of future results.
             </p>
+            <Link
+              href="/admin/login"
+              className="text-gray-700 hover:text-gray-500 text-xs font-inter transition-colors"
+            >
+              Admin
+            </Link>
           </div>
         </div>
       </div>
