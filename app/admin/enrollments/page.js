@@ -109,7 +109,7 @@ export default function AdminEnrollmentsPage() {
         </div>
       </div>
 
-      {editModal.open && (
+      {editModal.open && editModal.enrollment && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <GlassCard className="max-w-md w-full p-6 md:p-8 relative flex flex-col max-h-[90vh]">
             <button
@@ -125,7 +125,7 @@ export default function AdminEnrollmentsPage() {
                   Name
                 </label>
                 <p className="text-white font-inter text-sm bg-[#0A0A0A] px-4 py-3 rounded-xl border border-[#1A1A1A]">
-                  {editModal.enrollment.name}
+                  {editModal.enrollment?.name || ""}
                 </p>
               </div>
               <div>
@@ -133,7 +133,7 @@ export default function AdminEnrollmentsPage() {
                   Email
                 </label>
                 <p className="text-white font-inter text-sm bg-[#0A0A0A] px-4 py-3 rounded-xl border border-[#1A1A1A]">
-                  {editModal.enrollment.email}
+                  {editModal.enrollment?.email || ""}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -142,7 +142,7 @@ export default function AdminEnrollmentsPage() {
                     Plan
                   </label>
                   <p className="text-white font-inter text-sm bg-[#0A0A0A] px-4 py-3 rounded-xl border border-[#1A1A1A] capitalize">
-                    {editModal.enrollment.plan}
+                    {editModal.enrollment?.plan || ""}
                   </p>
                 </div>
                 <div>
@@ -150,7 +150,7 @@ export default function AdminEnrollmentsPage() {
                     Amount
                   </label>
                   <p className="text-white font-inter text-sm bg-[#0A0A0A] px-4 py-3 rounded-xl border border-[#1A1A1A]">
-                    ₹{Number(editModal.enrollment.amount).toLocaleString()}
+                    ₹{editModal.enrollment?.amount ? Number(editModal.enrollment.amount).toLocaleString() : "0"}
                   </p>
                 </div>
               </div>
@@ -159,7 +159,7 @@ export default function AdminEnrollmentsPage() {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const formData = new FormData(e.target);
-                  await handleUpdate(editModal.enrollment._id, {
+                  await handleUpdate(editModal.enrollment?._id, {
                     razorpayPaymentId: formData.get("razorpayPaymentId"),
                     status: formData.get("status"),
                   });
@@ -173,7 +173,7 @@ export default function AdminEnrollmentsPage() {
                   <input
                     type="text"
                     name="razorpayPaymentId"
-                    defaultValue={editModal.enrollment.razorpayPaymentId || ""}
+                    defaultValue={editModal.enrollment?.razorpayPaymentId || ""}
                     className="w-full px-4 py-3 rounded-xl bg-[#0A0A0A] border border-[#1A1A1A] text-white font-inter focus:outline-none focus:border-accent-gold transition-colors"
                     placeholder="e.g. pay_N1x2y3z4"
                   />
@@ -185,7 +185,7 @@ export default function AdminEnrollmentsPage() {
                   </label>
                   <select
                     name="status"
-                    defaultValue={editModal.enrollment.status || "pending"}
+                    defaultValue={editModal.enrollment?.status || "pending"}
                     className="w-full px-4 py-3 rounded-xl bg-[#0A0A0A] border border-[#1A1A1A] text-white font-inter focus:outline-none focus:border-accent-gold transition-colors"
                   >
                     <option value="paid">Paid</option>
