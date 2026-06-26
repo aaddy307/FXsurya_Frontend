@@ -33,7 +33,7 @@ export default function AdminDashboardPage() {
   const fetchData = async () => {
     try {
       const [videosRes, contactsRes, enrollmentsRes] = await Promise.all([
-        axios.get("/api/videos"),
+        axios.get("/api/videos?admin=true"),
         axios.get("/api/contact"),
         axios.get("/api/enrollment"),
       ]);

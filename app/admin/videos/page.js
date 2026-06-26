@@ -42,7 +42,7 @@ export default function AdminVideosPage() {
 
   const fetchVideos = async () => {
     try {
-      const res = await axios.get("/api/videos");
+      const res = await axios.get("/api/videos?admin=true");
       setVideos(res.data.data?.videos || res.data.videos || res.data || []);
     } catch (error) {
       console.error("Failed to fetch videos:", error);
