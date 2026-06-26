@@ -9,6 +9,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import DataTable from "@/components/admin/DataTable";
 import Button from "@/components/ui/Button";
 import VideoForm from "@/components/admin/VideoForm";
+import Pagination from "@/components/ui/Pagination";
 import axios from "@/lib/axios";
 import { formatDate, getRelativeTime, getErrorMessage } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -19,6 +20,11 @@ export default function AdminVideosPage() {
   const [deleteModal, setDeleteModal] = useState({ open: false, video: null });
   const [editModal, setEditModal] = useState({ open: false, video: null });
   const [editLoading, setEditLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [platformFilter, setPlatformFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,6 +35,10 @@ export default function AdminVideosPage() {
     }
     fetchVideos();
   }, [router]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [platformFilter, categoryFilter, statusFilter, searchQuery]);
 
   const fetchVideos = async () => {
     try {
@@ -83,6 +93,31 @@ export default function AdminVideosPage() {
     }
   };
 
+  const normalizedVideos = Array.isArray(videos) ? videos : [];
+
+  const filteredVideos = normalizedVideos.filter((v) => {
+    const matchesPlatform = platformFilter === "all" || v.platform?.toLowerCase() === platformFilter;
+    const matchesCategory = categoryFilter === "all" || v.category?.toLowerCase() === categoryFilter;
+    
+    let matchesStatus = true;
+    if (statusFilter === "published") matchesStatus = v.isPublished === true;
+    else if (statusFilter === "draft") matchesStatus = v.isPublished !== true;
+
+    const matchesSearch =
+      !searchQuery ||
+      (v.title && v.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (v.description && v.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    return matchesPlatform && matchesCategory && matchesStatus && matchesSearch;
+  });
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredVideos.length / itemsPerPage);
+  const paginatedVideos = filteredVideos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const columns = [
     {
       key: "thumbnail",
@@ -121,26 +156,81 @@ export default function AdminVideosPage() {
       <div className="flex-1 min-w-0 pt-16 md:pt-0">
         <AdminHeader title="Videos" />
         <div className="p-4 md:p-6">
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-gray-400 font-inter text-sm">
-              {videos.length} video{videos.length !== 1 ? "s" : ""} total
-            </p>
-            <Button onClick={() => router.push("/admin/videos/add")}>
-              Add New Video
-            </Button>
+          <div className="flex flex-col xl:flex-row gap-4 justify-between items-stretch xl:items-center mb-6">
+            <div className="flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Search videos by title or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-border text-white text-sm font-inter focus:outline-none focus:border-accent-gold transition-colors"
+              />
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <select
+                  value={platformFilter}
+                  onChange={(e) => setPlatformFilter(e.target.value)}
+                  className="px-4 py-2 rounded-xl bg-[#0F0F0F] border border-border text-white text-xs font-inter focus:outline-none focus:border-accent-gold transition-colors cursor-pointer"
+                >
+                  <option value="all">All Platforms</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="twitter">Twitter/X</option>
+                  <option value="other">Other</option>
+                </select>
+
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="px-4 py-2 rounded-xl bg-[#0F0F0F] border border-border text-white text-xs font-inter focus:outline-none focus:border-accent-gold transition-colors cursor-pointer"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="forex">Forex</option>
+                  <option value="crypto">Crypto</option>
+                  <option value="mindset">Mindset</option>
+                  <option value="propfirm">Prop Firms</option>
+                  <option value="general">General</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-2 rounded-xl bg-[#0F0F0F] border border-border text-white text-xs font-inter focus:outline-none focus:border-accent-gold transition-colors cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </div>
+
+              <Button size="sm" onClick={() => router.push("/admin/videos/add")}>
+                Add New Video
+              </Button>
+            </div>
           </div>
 
           <GlassCard className="p-0 overflow-hidden">
             {loading ? (
               <div className="p-8 text-center text-gray-500">Loading...</div>
             ) : (
-              <DataTable
-                columns={columns}
-                data={videos}
-                onToggle={handleToggle}
-                onEdit={(video) => setEditModal({ open: true, video })}
-                onDelete={(video) => setDeleteModal({ open: true, video })}
-              />
+              <div className="flex flex-col">
+                <DataTable
+                  columns={columns}
+                  data={paginatedVideos}
+                  onToggle={handleToggle}
+                  onEdit={(video) => setEditModal({ open: true, video })}
+                  onDelete={(video) => setDeleteModal({ open: true, video })}
+                />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  totalItems={filteredVideos.length}
+                  itemsPerPage={itemsPerPage}
+                />
+              </div>
             )}
           </GlassCard>
         </div>

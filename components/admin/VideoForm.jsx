@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { detectPlatform, getRelativeTime } from "@/lib/utils";
 import VideoCard from "@/components/ui/VideoCard";
 import Button from "@/components/ui/Button";
 import { AlertCircle } from "lucide-react";
+import axios from "@/lib/axios";
+import toast from "react-hot-toast";
 
 const platforms = [
   { label: "Instagram", value: "instagram" },
@@ -34,6 +37,32 @@ export default function VideoForm({ onSubmit, loading, initialData }) {
     createdAt: "",
   });
   const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    setUploading(true);
+    try {
+      const res = await axios.post("/api/admin/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const imageUrl = res.data.data?.url || res.data.url;
+      setForm((prev) => ({ ...prev, thumbnail: imageUrl }));
+      toast.success("Thumbnail uploaded successfully");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -198,16 +227,57 @@ export default function VideoForm({ onSubmit, loading, initialData }) {
 
         <div>
           <label className="block text-white font-inter text-sm mb-2">
-            Thumbnail URL (optional)
+            Thumbnail Image (optional)
           </label>
-          <input
-            type="url"
-            value={form.thumbnail}
-            onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-[#0A0A0A] border border-[#1A1A1A] text-white font-inter focus:outline-none focus:border-accent-gold transition-colors"
-            placeholder="Leave blank to use platform default"
-          />
-          <p className="text-gray-500 text-xs mt-1">
+          
+          <div className="flex items-center gap-4">
+            {form.thumbnail ? (
+              <div className="relative w-24 h-16 rounded-xl bg-[#0A0A0A] overflow-hidden border border-border group">
+                <Image
+                  src={form.thumbnail}
+                  alt="Thumbnail preview"
+                  fill
+                  className="object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, thumbnail: "" }))}
+                  className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs text-danger font-semibold transition-opacity"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="w-24 h-16 rounded-xl bg-[#0A0A0A] border border-dashed border-[#1A1A1A] flex items-center justify-center text-gray-500 text-xs">
+                No image
+              </div>
+            )}
+            
+            <label className={cn(
+              "px-4 py-2.5 rounded-xl border border-[#1A1A1A] bg-[#0A0A0A] text-white text-xs font-semibold font-inter transition-all cursor-pointer hover:border-accent-gold hover:text-accent-gold flex items-center gap-2",
+              uploading && "opacity-50 cursor-not-allowed"
+            )}>
+              {uploading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Uploading...
+                </>
+              ) : (
+                <span>Upload Image</span>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+          </div>
+          <p className="text-gray-500 text-xs mt-1.5">
             Leave blank to use platform default
           </p>
         </div>

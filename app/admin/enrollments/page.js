@@ -6,6 +6,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminHeader from "@/components/admin/AdminHeader";
 import GlassCard from "@/components/ui/GlassCard";
 import DataTable from "@/components/admin/DataTable";
+import Pagination from "@/components/ui/Pagination";
 import axios from "@/lib/axios";
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -15,6 +16,10 @@ export default function AdminEnrollmentsPage() {
   const [loading, setLoading] = useState(true);
   const [editModal, setEditModal] = useState({ open: false, enrollment: null });
   const [editLoading, setEditLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [planFilter, setPlanFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +30,10 @@ export default function AdminEnrollmentsPage() {
     }
     fetchEnrollments();
   }, [router]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [planFilter, statusFilter, searchQuery]);
 
   const fetchEnrollments = async () => {
     try {
@@ -56,6 +65,27 @@ export default function AdminEnrollmentsPage() {
       setEditLoading(false);
     }
   };
+
+  const normalizedEnrollments = Array.isArray(enrollments) ? enrollments : [];
+
+  const filteredEnrollments = normalizedEnrollments.filter((e) => {
+    const matchesPlan = planFilter === "all" || e.plan === planFilter;
+    const matchesStatus = statusFilter === "all" || e.status === statusFilter;
+    const matchesSearch =
+      !searchQuery ||
+      (e.name && e.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.email && e.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (e.razorpayPaymentId && e.razorpayPaymentId.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    return matchesPlan && matchesStatus && matchesSearch;
+  });
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredEnrollments.length / itemsPerPage);
+  const paginatedEnrollments = filteredEnrollments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const columns = [
     { key: "name", label: "Name" },
@@ -91,19 +121,76 @@ export default function AdminEnrollmentsPage() {
       <div className="flex-1 min-w-0 pt-16 md:pt-0">
         <AdminHeader title="Enrollments" />
         <div className="p-4 md:p-6">
-          <p className="text-gray-400 font-inter text-sm mb-6">
-            {enrollments.length} enrollment{enrollments.length !== 1 ? "s" : ""} total
-          </p>
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-6">
+            <div className="flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Search enrollments by name, email, or payment ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-surface-light border border-border text-white text-sm font-inter focus:outline-none focus:border-accent-gold transition-colors"
+              />
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 font-inter text-xs uppercase tracking-wider">Plan:</span>
+                <div className="flex gap-1.5">
+                  {["all", "monthly", "lifetime"].map((plan) => (
+                    <button
+                      key={plan}
+                      onClick={() => setPlanFilter(plan)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer ${
+                        planFilter === plan
+                          ? "bg-accent-gold text-black"
+                          : "bg-surface border border-border text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      {plan}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 font-inter text-xs uppercase tracking-wider">Status:</span>
+                <div className="flex gap-1.5">
+                  {["all", "paid", "pending"].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setStatusFilter(status)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer ${
+                        statusFilter === status
+                          ? "bg-accent-gold text-black"
+                          : "bg-surface border border-border text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <GlassCard className="p-0 overflow-hidden">
             {loading ? (
               <div className="p-8 text-center text-gray-500">Loading...</div>
             ) : (
-              <DataTable
-                columns={columns}
-                data={enrollments}
-                onEdit={(enrollment) => setEditModal({ open: true, enrollment })}
-              />
+              <div className="flex flex-col">
+                <DataTable
+                  columns={columns}
+                  data={paginatedEnrollments}
+                  onEdit={(enrollment) => setEditModal({ open: true, enrollment })}
+                />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  totalItems={filteredEnrollments.length}
+                  itemsPerPage={itemsPerPage}
+                />
+              </div>
             )}
           </GlassCard>
         </div>

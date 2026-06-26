@@ -92,9 +92,11 @@ export default function AdminSidebar({ onLogout }) {
         </Link>
       </div>
 
-      {/* Desktop Sidebar (static) */}
-      <div className="hidden md:flex w-64 min-h-screen bg-[#0F0F0F] border-r border-[#1A1A1A] flex-col shrink-0">
-        {sidebarContent}
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block w-64 shrink-0">
+        <div className="w-64 h-screen fixed top-0 left-0 bg-[#0F0F0F] border-r border-[#1A1A1A] flex flex-col z-30">
+          {sidebarContent}
+        </div>
       </div>
 
       {/* Mobile Sidebar Drawer Overlay */}

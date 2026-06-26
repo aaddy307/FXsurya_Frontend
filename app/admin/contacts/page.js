@@ -7,6 +7,7 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import GlassCard from "@/components/ui/GlassCard";
 import DataTable from "@/components/admin/DataTable";
 import Button from "@/components/ui/Button";
+import Pagination from "@/components/ui/Pagination";
 import axios from "@/lib/axios";
 import { formatDate, truncate } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -15,6 +16,8 @@ export default function AdminContactsPage() {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [expandedContact, setExpandedContact] = useState(null);
   const router = useRouter();
 
@@ -26,6 +29,10 @@ export default function AdminContactsPage() {
     }
     fetchContacts();
   }, [router]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, searchQuery]);
 
   const fetchContacts = async () => {
     try {
@@ -44,9 +51,23 @@ export default function AdminContactsPage() {
   };
 
   const normalizedContacts = Array.isArray(contacts) ? contacts : [];
-  const filteredContacts = filter === "all"
-    ? normalizedContacts
-    : normalizedContacts.filter((c) => c.type === filter);
+  
+  const filteredContacts = normalizedContacts.filter((c) => {
+    const matchesFilter = filter === "all" || c.type === filter;
+    const matchesSearch =
+      !searchQuery ||
+      (c.name && c.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (c.message && c.message.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesFilter && matchesSearch;
+  });
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage);
+  const paginatedContacts = filteredContacts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const columns = [
     { key: "name", label: "Name" },
@@ -99,24 +120,34 @@ export default function AdminContactsPage() {
       <div className="flex-1 min-w-0 pt-16 md:pt-0">
         <AdminHeader title="Contacts" />
         <div className="p-4 md:p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <p className="text-gray-400 font-inter text-sm">
-              {filteredContacts.length} contact{filteredContacts.length !== 1 ? "s" : ""}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {["all", "general", "partnership", "student"].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setFilter(type)}
-                  className={`px-4 py-2 rounded-full text-xs font-semibold capitalize transition-colors ${
-                    filter === type
-                      ? "bg-accent-gold text-black"
-                      : "bg-surface text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-6">
+            <div className="flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Search contacts by name, email, or message..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-surface-light border border-border text-white text-sm font-inter focus:outline-none focus:border-accent-gold transition-colors"
+              />
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-gray-400 font-inter text-xs uppercase tracking-wider">Filter:</span>
+              <div className="flex flex-wrap gap-2">
+                {["all", "general", "partnership", "student"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setFilter(type)}
+                    className={`px-4 py-2 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer ${
+                      filter === type
+                        ? "bg-accent-gold text-black"
+                        : "bg-surface border border-border text-gray-400 hover:text-white hover:border-gray-500"
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -124,12 +155,21 @@ export default function AdminContactsPage() {
             {loading ? (
               <div className="p-8 text-center text-gray-500">Loading...</div>
             ) : (
-              <DataTable
-                columns={columns}
-                data={filteredContacts}
-                expandable
-                expandableContent={renderExpanded}
-              />
+              <div className="flex flex-col">
+                <DataTable
+                  columns={columns}
+                  data={paginatedContacts}
+                  expandable
+                  expandableContent={renderExpanded}
+                />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  totalItems={filteredContacts.length}
+                  itemsPerPage={itemsPerPage}
+                />
+              </div>
             )}
           </GlassCard>
         </div>
