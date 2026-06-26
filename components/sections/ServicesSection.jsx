@@ -29,7 +29,7 @@ const services = [
       "Companies and HNIs can allocate capital for me to trade and manage. Transparent track record. Consistent approach.",
     tag: "Open to Proposals",
     cta: "Submit Proposal",
-    href: "/partner",
+    href: "/partner#submit-proposal",
   },
 ];
 

@@ -136,13 +136,14 @@ export default function PartnerPageContent() {
             </p>
           </motion.div>
 
-          <SectionHeading label="SUBMIT PROPOSAL" heading="Let's Talk Business" />
+          <div id="submit-proposal" className="scroll-mt-28">
+            <SectionHeading label="SUBMIT PROPOSAL" heading="Let's Talk Business" />
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
             <GlassCard className="max-w-2xl mx-auto p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -228,6 +229,7 @@ export default function PartnerPageContent() {
               </form>
             </GlassCard>
           </motion.div>
+          </div>
         </div>
       </section>
 

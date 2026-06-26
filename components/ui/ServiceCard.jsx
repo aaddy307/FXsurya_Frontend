@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export default function ServiceCard({
   icon: Icon,
@@ -8,6 +9,7 @@ export default function ServiceCard({
   description,
   tag,
   cta,
+  href,
   className,
 }) {
   return (
@@ -28,12 +30,12 @@ export default function ServiceCard({
         </span>
       )}
       {cta && (
-        <a
-          href="#"
+        <Link
+          href={href || "#"}
           className="inline-flex items-center text-accent-gold font-semibold hover:text-accent-gold-hover transition-colors"
         >
           {cta} →
-        </a>
+        </Link>
       )}
     </div>
   );
